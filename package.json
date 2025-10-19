@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@lark-base-open/connector-api": "^0.1.0",
-    "antd": "^5.14.2"
+    "antd": "^5.14.2",
+    "moment": "^2.30.1"
   }
 }
