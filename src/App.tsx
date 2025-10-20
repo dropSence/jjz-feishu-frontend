@@ -36,6 +36,13 @@ export default function App() {
       MATID: config["MATID"],
       p_tabseq: config["p_tabseq"],
     });
+    bitable.saveConfigAndGoNext({
+      startDate: dayjs(config["startDate"]).format(dateFormat),
+      endDate: dayjs(config["endDate"]).format(dateFormat),
+      MATNAME: config["MATNAME"],
+      MATID: config["MATID"],
+      p_tabseq: config["p_tabseq"],
+    });
   };
   return (
     <div>
