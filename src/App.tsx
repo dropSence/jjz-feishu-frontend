@@ -2,77 +2,95 @@ import "./App.css";
 
 import { useState, useEffect } from "react";
 import { bitable } from "@lark-base-open/connector-api";
-import { Button, Form, Input, DatePicker } from "antd";
-import moment from 'moment';
+import { Button, Form, Input, DatePicker, Radio } from "antd";
+import moment from "moment";
 
 export default function App() {
-    const [value, setValue] = useState("");
-    const [userId, setUserId] = useState("");
-    const [tenantKey, setTenantKey] = useState("");
-    const { RangePicker } = DatePicker;
+  const [value, setValue] = useState("");
+  const [userId, setUserId] = useState("");
+  const [tenantKey, setTenantKey] = useState("");
+  const [tabseqValue, setTabseqValue] = useState(1);
+  const { RangePicker } = DatePicker;
 
-    useEffect(() => {
-        bitable.getConfig().then((config) => {
-            console.log("pre sync config", config);
-            setValue(config?.value || "");
-        });
-        bitable.getUserId().then((id) => {
-            console.log("userId", id);
-            setUserId(id);
-        });
-        bitable.getTenantKey().then((key) => {
-            console.log("tenantKey", key);
-            setTenantKey(key);
-        });
-    }, []);
+  useEffect(() => {
+    bitable.getConfig().then((config) => {
+      console.log("pre sync config", config);
+      setValue(config?.value || "");
+    });
+    bitable.getUserId().then((id) => {
+      console.log("userId", id);
+      setUserId(id);
+    });
+    bitable.getTenantKey().then((key) => {
+      console.log("tenantKey", key);
+      setTenantKey(key);
+    });
+  }, []);
+  const onChange = (e: any) => {
+    setValue(e.target.value);
+  };
+  const handleSaveConfig = (config: any) => {
+    console.log("startDate", {
+      startDate: moment(config["startDate"]).format("YYYY-MM-DD"),
+      endDate: moment(config["endDate"]).format("YYYY-MM-DD"),
+      MATNAME: config["MATNAME"],
+      MATID: config["MATID"],
+      p_tabseq: config["p_tabseq"],
+    });
+    bitable.saveConfigAndGoNext({
+      startDate: moment(config["startDate"]).format("YYYY-MM-DD"),
+      endDate: moment(config["endDate"]).format("YYYY-MM-DD"),
+      MATNAME: config["MATNAME"],
+      MATID: config["MATID"],
+      p_tabseq: config["p_tabseq"],
+    });
+  };
 
-    const handleSaveConfig = (config: any) => {
-        const startDate = moment(config['config-item-1'][0]).format('YYYY-MM-DD');
-        const endDate = moment(config['config-item-1'][1]).format('YYYY-MM-DD');
-        console.log("startDate", {
-            startDate,
-            endDate,
-            MATNAME: config['MATNAME'],
-            MATID: config['MATID'],
-        });
-        bitable.saveConfigAndGoNext({
-            startDate,
-            endDate,
-            MATNAME: config['MATNAME'],
-            MATID: config['MATID'],
-        });
-    };
-
-    return (
-        <div>
-            <Form
-                name="basic"
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                style={{ maxWidth: 600 }}
-                onFinish={handleSaveConfig}
-                autoComplete="off"
-                initialValues={{
-                    remember: true,
-                    // 这里的属性名 "timeRange" 需要与下面 Form.Item 的 name 一致
-                    "config-item-1": [moment().subtract(7, 'days'), moment()] // 设置默认时间范围为前七天至今
-                }}
-            >
-                <Form.Item label="时间范围" name="config-item-1">
-                    <RangePicker />
-                </Form.Item>
-                <Form.Item label="视频名称" name="MATNAME">
-                    <Input />
-                </Form.Item>
-                <Form.Item label="素材ID" name="MATID">
-                    <Input />
-                </Form.Item>
-                <Form.Item label="">
-                    <Button type="primary" htmlType="submit">
-                        下一步
-                    </Button>
-                </Form.Item>
-            </Form>
-        </div>
-    );
+  return (
+    <div>
+      <Form
+        name="basic"
+        labelCol={{ span: 8 }}
+        wrapperCol={{ span: 16 }}
+        style={{ maxWidth: 600 }}
+        onFinish={handleSaveConfig}
+        autoComplete="off"
+        initialValues={{
+          remember: true,
+          startDate: moment().subtract(7, "days"), // 修正：直接使用moment对象，而非格式化后的字符串
+          endDate: moment(), // 修正：直接使用moment对象
+          p_tabseq: tabseqValue,
+        }}
+      >
+        <Form.Item label="起始时间" name="startDate">
+          <DatePicker />
+        </Form.Item>
+        <Form.Item label="结束时间" name="endDate">
+          <DatePicker />
+        </Form.Item>
+        <Form.Item label="类型" name="p_tabseq">
+          <Radio.Group
+            value={tabseqValue}
+            onChange={onChange}
+            options={[
+              { value: 1, label: "推商品" },
+              { value: 3, label: "推直播间" },
+              { value: 4, label: "汇总" },
+            ]}
+          />
+        </Form.Item>
+        <Form.Item label="视频名称" name="MATNAME">
+          <Input />
+        </Form.Item>
+        <Form.Item label="素材ID" name="MATID">
+          <Input />
+        </Form.Item>
+        <Form.Item label="">
+          <Button type="primary" htmlType="submit">
+            下一步
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
+  );
 }
