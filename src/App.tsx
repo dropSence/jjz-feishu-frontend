@@ -1,17 +1,16 @@
 import "./App.css";
-
 import { useState, useEffect } from "react";
 import { bitable } from "@lark-base-open/connector-api";
 import { Button, Form, Input, DatePicker, Radio } from "antd";
-import moment from "moment";
-
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+dayjs.extend(customParseFormat);
+const dateFormat = "YYYY-MM-DD";
 export default function App() {
   const [value, setValue] = useState("");
   const [userId, setUserId] = useState("");
   const [tenantKey, setTenantKey] = useState("");
   const [tabseqValue, setTabseqValue] = useState(1);
-  const { RangePicker } = DatePicker;
-
   useEffect(() => {
     bitable.getConfig().then((config) => {
       console.log("pre sync config", config);
@@ -31,21 +30,13 @@ export default function App() {
   };
   const handleSaveConfig = (config: any) => {
     console.log("startDate", {
-      startDate: moment(config["startDate"]).format("YYYY-MM-DD"),
-      endDate: moment(config["endDate"]).format("YYYY-MM-DD"),
-      MATNAME: config["MATNAME"],
-      MATID: config["MATID"],
-      p_tabseq: config["p_tabseq"],
-    });
-    bitable.saveConfigAndGoNext({
-      startDate: moment(config["startDate"]).format("YYYY-MM-DD"),
-      endDate: moment(config["endDate"]).format("YYYY-MM-DD"),
+      startDate: dayjs(config["startDate"]).format(dateFormat),
+      endDate: dayjs(config["endDate"]).format(dateFormat),
       MATNAME: config["MATNAME"],
       MATID: config["MATID"],
       p_tabseq: config["p_tabseq"],
     });
   };
-
   return (
     <div>
       <Form
@@ -57,8 +48,8 @@ export default function App() {
         autoComplete="off"
         initialValues={{
           remember: true,
-          startDate: moment().subtract(7, "days"), // 修正：直接使用moment对象，而非格式化后的字符串
-          endDate: moment(), // 修正：直接使用moment对象
+          startDate: dayjs().subtract(7, "days"),
+          endDate: dayjs(),
           p_tabseq: tabseqValue,
         }}
       >

@@ -23,6 +23,7 @@
   "dependencies": {
     "@lark-base-open/connector-api": "^0.1.0",
     "antd": "^5.14.2",
+    "dayjs": "^1.11.18",
     "moment": "^2.30.1"
   }
 }
